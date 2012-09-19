@@ -5,7 +5,9 @@ var Diva = Backbone.Model.extend({
 		name: "Artist Name",
 		channel: "YouTube Channel",
 		videos: []
-	}
+	},
+
+	url: "/divas"
 
 });
 
@@ -25,6 +27,34 @@ var AdminView = Backbone.View.extend({
 
 	tagName: "div",
 
+	channelSearch: function() {
+		$("#channel-list").empty();
+		var query = $("#diva-name").val();
+		$.ajax({
+			url: "https://gdata.youtube.com/feeds/api/channels",
+			data: {
+				q: query,
+				v: 2,
+				"max-results": 5,
+				alt: "json"
+			},
+			success: function(json) {
+				var channelOptions = [];
+				var results = json.feed.entry;
+				if (!results) {
+					channelOptions.push("Sorry, we couldn't find anything.");
+				}
+				$.each(results, function(index, channel) {
+					channelOptions.push(channel.author[0].name.$t);
+				});
+				$.each(channelOptions, function(index, channel) {
+					channelDiv = $("<div>").html(channel);
+					$("#channel-list").append(channelDiv);
+				});
+			}
+		});
+	},
+
 	createDiva: function() {
 		nameInput = $("#diva-name").val();
 		channelInput = $("#diva-channel").val();
@@ -39,6 +69,9 @@ var AdminView = Backbone.View.extend({
 	},
 
 	initialize: function() {
+		var Divas = new DivaCollection();
+		console.log(Divas);
+		$("#find-channel").click(this.channelSearch);
 		$("#create-diva").click(this.createDiva);
 	}
 
