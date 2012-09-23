@@ -112,6 +112,7 @@ class ArtistHandler(webapp2.RequestHandler):
         # get artist (based on artist's name) from datastore
         # remove artist
         # return confirmation
+        # blah blah blah
         artist = Artist.get_by_id(id)
         if artist is None:
             self.response.status = 404
