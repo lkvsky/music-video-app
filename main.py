@@ -1,7 +1,7 @@
 import os
 import webapp2
 import jinja2
-import simplejson
+import json
 import urllib2
 import logging
 
@@ -37,11 +37,12 @@ class ArtistHandler(webapp2.RequestHandler):
         for artist in Artist.all():
             artist_obj = artist.to_dict()
             artists.append(artist_obj)
+        # remove
         if len(artists) < 1:
             self.response.status = 400
             self.response.out.write("There are no artists yet")
             return
-        self.response.out.write(simplejson.dumps(artists))
+        self.response.out.write(json.dumps(artists))
 
     def post(self):
         #  get name and ytid from request
@@ -67,7 +68,7 @@ class ArtistHandler(webapp2.RequestHandler):
         try:
             url = "http://gdata.youtube.com/feeds/api/videos?author=%s&v=2&alt=json&format=5" % (channel)
             response = urllib2.urlopen(url)
-            results = simplejson.loads(response.read())
+            results = json.loads(response.read())
             video_list = results.get("feed", {}).get("entry", [])
             artist_videos = []
             for video in video_list:
@@ -76,45 +77,51 @@ class ArtistHandler(webapp2.RequestHandler):
                     "title": video["media$group"]["media$title"]["$t"],
                     "img": video["media$group"]["media$thumbnail"][0]["url"],
                     })
-            videos_json = simplejson.dumps(artist_videos)
+            videos_json = json.dumps(artist_videos)
             artist = Artist(name=name, channel=channel, videos=videos_json)
             artist.put()
             artist_info = artist.to_dict()
-            self.response.out.write(simplejson.dumps(artist_info))
+            self.response.out.write(json.dumps(artist_info))
         except urllib2.HTTPError, e:
             logging.info(e.read())
             self.response.status = 400
             self.response.out.write("Something went wrong")
 
-    def put(self, artist):
+    def put(self, id):
         # get artist from datastore
         # update entity based on client request
         # save info
-        q = db.Query(Artist)
-        match = q.filter("name =", artist)
-        if match.count() == 0:
+        artist = Artist.get_by_id(id)
+        if artist is None:
+            self.response.status = 404
+            self.response.out.write("Diva not found")
             return
-        returned_artist = match[0]
-        data = simplejson.loads(self.request.body)
-        returned_artist.name = data["name"]
-        returned_artist.channel = data["channel"]
-        returned_artist.videos = data["videos"]
-        returned_artist.put()
-        return_toclient = returned_artist.to_dict()
-        self.response.out.write(simplejson.dumps(return_toclient))
+        data = json.loads(self.request.body)
+        if "name" not in data or "channel" not in data or "videos" not in data:
+            self.response.status = 400
+            self.response.out.write("give me more")
+            return
+        artist.name = data["name"]
+        artist.channel = data["channel"]
+        artist.videos = data["videos"]
+        artist.put()
+        artist_dict = artist.to_dict()
+        self.response.out.write(json.dumps(artist_dict))
 
-    def delete(self, artist):
+    def delete(self, id):
         # get artist (based on artist's name) from datastore
         # remove artist
         # return confirmation
-        q = db.Query(Artist)
-        match = q.filter("name =", artist)
-        if match.count() == 0:
+        artist = Artist.get_by_id(id)
+        if artist is None:
+            self.response.status = 404
+            self.response.out.write("Diva not found")
             return
-        match[0].delete()
+        artist.delete()
 
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/divas', ArtistHandler)
+    ('/divas', ArtistHandler),
+    ('/divas/(\d+)', ArtistHandler),
     ],  debug=True)
