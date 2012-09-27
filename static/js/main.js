@@ -21,6 +21,8 @@ var Divas = Backbone.Collection.extend({
 //Views
 var DivaView = Backbone.View.extend({
 
+	model: Diva,
+
 	events: {
 		"click #edit-btn" : "editDiva",
 		"click #save-btn" : "saveDiva",
@@ -28,11 +30,10 @@ var DivaView = Backbone.View.extend({
 	},
 
 	initialize: function() {
-		_.bindAll(this, "render"),
+		_.bindAll(this, "render");
 
 		this.model.bind('change', this.render);
-		this.model.bind('destroy', this.remove);
-		this.render();
+		this.model.bind('destroy', this.deleteDiva);
 	},
 
 	render: function() {
@@ -55,7 +56,7 @@ var DivaView = Backbone.View.extend({
 
 	deleteDiva: function() {
 		this.model.destroy();
-		this.remove();
+		this.model.remove();
 	}
 
 });
@@ -68,18 +69,18 @@ var AdminView = Backbone.View.extend({
 	},
 
 	initialize: function() {
-		//_.bindAll(this, 'addDiva', 'addAllDivas');
+		_.bindAll(this, 'channelSearch', 'createDiva');
 
 		this.divas = new Divas();
 
 		this.divas.bind("reset", this.displayAll, this);
-		this.divas.bind("add", this.displayDiva, this);
+		this.divas.bind("change", this.displayDiva, this);
 
 		this.divas.fetch();
 	},
 
-	displayDiva: function() {
-		var view = new DivaView();
+	displayDiva: function(diva) {
+		var view = new DivaView({model:diva});
 		$("#diva-list").append(view.render());
 	},
 

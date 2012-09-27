@@ -2,7 +2,7 @@ body {
     padding-top: 60px;
     padding-bottom: 40px;
 }
-.diva-info {
+.diva-info, .editing {
 	margin-bottom: 15px;
 }
 .diva-info::first-line {
