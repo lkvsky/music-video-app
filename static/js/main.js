@@ -3,61 +3,94 @@ var Diva = Backbone.Model.extend({
 
 	defaults: {
 		name: "Artist Name",
-		channel: "YouTube Channel",
-		videos: []
+		channel: "YouTube Channel"
 	},
 
-	url: "/divas"
+	urlRoot: "/divas"
 
 });
 
-//Collections
-var DivaCollection = Backbone.Collection.extend({
+//Collection
+var Divas = Backbone.Collection.extend({
 
 	model: Diva,
 
 	url: "/divas"
-
 });
 
 //Views
-var AdminView = Backbone.View.extend({
-
-	model: Diva,
-
-	el: $("#diva-list"),
-
-	divaTemplate: _.template("diva-list-tpl"),
+var DivaView = Backbone.View.extend({
 
 	events: {
-		"click #channel-search" : "channelSearch",
-		"click #create-diva" : "createDiva"
+		"click #edit-btn" : "editDiva",
+		"click #save-btn" : "saveDiva",
+		"click .destroy"  : "deleteDiva"
 	},
 
 	initialize: function() {
-		//bind listeners for reset and change events
-		var divas = new DivaCollection();
-		divas.fetch();
-		console.log(divas);
-		_.bindAll(this, "channelSearch", "createDiva");
-		$("#find-channel").click(this.channelSearch);
-		$("#create-diva").click(this.createDiva);
-		divas.create({name: "Nicki Minaj", channel: "NickiMinajVEVO"}, {
-			//success -- clear form
-			error: function() {
-				console.log("oh hellll no");
-			}
-		});
+		_.bindAll(this, "render"),
+
+		this.model.bind('change', this.render);
+		this.model.bind('destroy', this.remove);
+		this.render();
 	},
 
 	render: function() {
-		$(this.el).html(this.divaTemplate({name: this.model.name, channel: this.model.channel}));
-		return this;
+		var compiled = _.template($("#diva-view-tpl").html());
+		var item = compiled(this.model.toJSON());
+		var rendered = $(this.el).html(item);
+		return rendered;
 	},
 
-	addModel: function() {
-		//utilize backbone add event to make sure collection knows it's being updated
-		//divas.create() to make sure collection is updated properly
+	editDiva: function() {
+		$(this.el).addClass("editing");
+	},
+
+	saveDiva: function() {
+		var editedName = $("#edited-name").val();
+		var editedChannel = $("#edited-channel").val();
+		this.model.save({ name : editedName, channel : editedChannel });
+		$(this.el).removeClass("editing");
+	},
+
+	deleteDiva: function() {
+		this.model.destroy();
+		this.remove();
+	}
+
+});
+
+var AdminView = Backbone.View.extend({
+
+	events: {
+		"click #find-channel" : "channelSearch",
+		"click #create-diva"  : "createDiva"
+	},
+
+	initialize: function() {
+		//_.bindAll(this, 'addDiva', 'addAllDivas');
+
+		this.divas = new Divas();
+
+		this.divas.bind("reset", this.displayAll, this);
+		this.divas.bind("add", this.displayDiva, this);
+
+		this.divas.fetch();
+	},
+
+	displayDiva: function() {
+		var view = new DivaView();
+		$("#diva-list").append(view.render());
+	},
+
+	displayAll: function() {
+		this.divas.each(this.displayDiva);
+	},
+
+	createDiva: function() {
+		var nameInput = $("#diva-name").val();
+		var channelInput = $("#diva-channel").val();
+		this.divas.add({ name : nameInput, channel : channelInput });
 	},
 
 	channelSearch: function() {
@@ -81,27 +114,13 @@ var AdminView = Backbone.View.extend({
 					channelOptions.push(channel.author[0].name.$t);
 				});
 				$.each(channelOptions, function(index, channel) {
-					channelDiv = $("<div>").html(channel);
+					var channelDiv = $("<div>").html(channel);
 					$("#channel-list").append(channelDiv);
 				});
-			}
-		});
-	},
-
-	createDiva: function() {
-		var nameInput = $("#diva-name").val();
-		var channelInput = $("#diva-channel").val();
-		$.ajax({
-			type: "POST",
-			url: "/divas",
-			data: {
-				name: nameInput,
-				channel: channelInput
 			}
 		});
 	}
 
 });
 
-//Router
 var App = new AdminView();

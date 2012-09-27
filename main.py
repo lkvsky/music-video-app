@@ -11,6 +11,10 @@ jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 
+def is_devserver():
+    return os.environ['SERVER_SOFTWARE'].startswith("Dev")
+
+
 class Artist(db.Model):
     name = db.StringProperty()
     channel = db.StringProperty()
@@ -24,8 +28,11 @@ class Artist(db.Model):
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
+        values = {
+        'debug': is_devserver()
+        }
         template = jinja_environment.get_template('index.html')
-        self.response.out.write(template.render())
+        self.response.out.write(template.render(values))
 
 
 #Handler for Artist collection
@@ -45,12 +52,13 @@ class ArtistHandler(webapp2.RequestHandler):
         self.response.out.write(json.dumps(artists))
 
     def post(self):
-        #  get name and ytid from request
+        #  get name and channel from request
         #  search youtube for matching videos
         #  store into new artist
         #  save and return artist as json
-        name = self.request.get("name", "")
-        channel = self.request.get("channel", "")
+        data = json.loads(self.request.body)
+        name = data.get("name", "")
+        channel = data.get("channel", "")
         if len(name) < 1:
             self.response.status = 400
             self.response.out.write("You didn't give us a name")
@@ -112,7 +120,6 @@ class ArtistHandler(webapp2.RequestHandler):
         # get artist (based on artist's name) from datastore
         # remove artist
         # return confirmation
-        # blah blah blah
         artist = Artist.get_by_id(id)
         if artist is None:
             self.response.status = 404

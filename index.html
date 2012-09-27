@@ -46,28 +46,41 @@
                     </form>
                 </div>
             </div>
-            <div class="row">
-                <div class="span12" id="diva-list">
+            <div class="row" id="diva-wrapper">
+                <div class="span3" id="diva-list">
                 </div>
             </div>
 
 
         </div> <!-- /container -->
         <!-- templates -->
-        <script id="diva-list-tpl" type="text/underscore">
-        <div>
-            <h1><%= name %></h1>
+        <script id="diva-view-tpl" type="text/underscore">
+        <div class="diva-info">
+            <%= name %>
             <br>
-            <h2><%= channel %></h2>
+            <%= channel %>
             <br>
-            <span class="delete">Delete</span>
+            <button type="button" class="btn btn-primary" id="edit-btn">Edit</button>
+            <button type="button" class="btn btn-danger destroy">Delete</button>
+        </div>
+        <div class="edit">
+            <input type="text" value="<%= name %>" id="edited-name">
+            <br>
+            <input type="text" value="<%= channel %>" id="edited-channel">
+            <br>
+            <button type="button" class="btn btn-primary" id="save-btn">Save</button>
+            <button type="button" class="btn btn-danger destroy">Delete</button>
         </div>
         </script>
         <!-- /templates -->
+        {% if debug %}
         <script src="static/js/lib/jquery-1.8.0.min.js"></script>
         <script src="static/js/lib/underscore-min.js"></script>
         <script src="static/js/lib/backbone-min.js"></script>
         <script src="static/js/main.js"></script>
+        {% else %}
+        <script src="static/build/all.min.js"></script>
+        {% endif %}
     </body>
 </html>
 
