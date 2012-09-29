@@ -15,6 +15,21 @@ def is_devserver():
     return os.environ['SERVER_SOFTWARE'].startswith("Dev")
 
 
+def video_search(channel):
+    url = "http://gdata.youtube.com/feeds/api/videos?author=%s&v=2&alt=json&format=5" % (channel)
+    response = urllib2.urlopen(url)
+    results = json.loads(response.read())
+    video_list = results.get("feed", {}).get("entry", [])
+    artist_videos = []
+    for video in video_list:
+        artist_videos.append({
+            "ytid": video["media$group"]["yt$videoid"]["$t"],
+            "title": video["media$group"]["media$title"]["$t"],
+            "img": video["media$group"]["media$thumbnail"][0]["url"],
+            })
+    return json.dumps(artist_videos)
+
+
 class Artist(db.Model):
     name = db.StringProperty()
     channel = db.StringProperty()
@@ -72,21 +87,10 @@ class AllArtistHandler(webapp2.RequestHandler):
         qExist = q.filter("name =", name)
         if qExist.count() > 0:
             self.response.status = 400
-            self.response.out.write("This channel already exists")
+            self.response.out.write("This artist already exists")
             return
         try:
-            url = "http://gdata.youtube.com/feeds/api/videos?author=%s&v=2&alt=json&format=5" % (channel)
-            response = urllib2.urlopen(url)
-            results = json.loads(response.read())
-            video_list = results.get("feed", {}).get("entry", [])
-            artist_videos = []
-            for video in video_list:
-                artist_videos.append({
-                    "ytid": video["media$group"]["yt$videoid"]["$t"],
-                    "title": video["media$group"]["media$title"]["$t"],
-                    "img": video["media$group"]["media$thumbnail"][0]["url"],
-                    })
-            videos_json = json.dumps(artist_videos)
+            videos_json = video_search(channel)
             artist = Artist(name=name, channel=channel, videos=videos_json)
             artist.put()
             artist_info = artist.to_dict()
@@ -114,6 +118,8 @@ class SinglArtistHandler(webapp2.RequestHandler):
             self.response.out.write("give me more")
             return
         artist.name = data["name"]
+        if artist.channel != data["channel"]:
+            data["videos"] = video_search(data["channel"])
         artist.channel = data["channel"]
         artist.videos = data["videos"]
         artist.put()
