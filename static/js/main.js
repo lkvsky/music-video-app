@@ -24,8 +24,8 @@ var DivaView = Backbone.View.extend({
 	model: Diva,
 
 	events: {
-		"click #edit-btn" : "editDiva",
-		"click #save-btn" : "saveDiva",
+		"click .edit-btn" : "editDiva",
+		"click .save-btn" : "saveDiva",
 		"click .destroy"  : "deleteDiva"
 	},
 
@@ -37,10 +37,10 @@ var DivaView = Backbone.View.extend({
 	},
 
 	render: function() {
-		var compiled = _.template($("#diva-view-tpl").html());
-		var item = compiled(this.model.toJSON());
-		var rendered = $(this.el).html(item);
-		return rendered;
+		this.compiled = _.template($("#diva-view-tpl").html());
+		this.item = this.compiled(this.model.toJSON());
+		this.rendered = $(this.el).html(this.item);
+		return this.rendered;
 	},
 
 	editDiva: function() {
@@ -48,15 +48,15 @@ var DivaView = Backbone.View.extend({
 	},
 
 	saveDiva: function() {
-		var editedName = $("#edited-name").val();
-		var editedChannel = $("#edited-channel").val();
-		this.model.save({ name : editedName, channel : editedChannel });
+		this.editedName = this.$(".edited-name").val();
+		this.editedChannel = this.$(".edited-channel").val();
+		this.model.save({ name : this.editedName, channel : this.editedChannel });
 		$(this.el).removeClass("editing");
 	},
 
 	deleteDiva: function() {
+		$(this.el).remove();
 		this.model.destroy();
-		this.model.remove();
 	}
 
 });
@@ -74,7 +74,9 @@ var AdminView = Backbone.View.extend({
 		this.divas = new Divas();
 
 		this.divas.bind("reset", this.displayAll, this);
-		this.divas.bind("change", this.displayDiva, this);
+		this.divas.bind("add", this.displayDiva, this);
+		$("#find-channel").click(this.channelSearch);
+		$("#create-diva").click(this.createDiva);
 
 		this.divas.fetch();
 	},
@@ -89,9 +91,9 @@ var AdminView = Backbone.View.extend({
 	},
 
 	createDiva: function() {
-		var nameInput = $("#diva-name").val();
-		var channelInput = $("#diva-channel").val();
-		this.divas.add({ name : nameInput, channel : channelInput });
+		this.nameInput = $("#diva-name").val();
+		this.channelInput = $("#diva-channel").val();
+		this.divas.create({ name : this.nameInput, channel : this.channelInput });
 	},
 
 	channelSearch: function() {

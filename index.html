@@ -31,7 +31,7 @@
         <div class="container">
 
             <div class="row">
-                <div class="span12" id="diva-creater">
+                <div class="span3" id="diva-creator">
                     <form>
                         <legend>Create a Diva</legend>
                         <label>Artist Name</label>
@@ -45,12 +45,9 @@
                         <button type="button" class="btn" id="create-diva">Create</button>
                     </form>
                 </div>
-            </div>
-            <div class="row" id="diva-wrapper">
-                <div class="span3" id="diva-list">
+                <div class="span6" id="diva-list">
                 </div>
             </div>
-
 
         </div> <!-- /container -->
         <!-- templates -->
@@ -60,15 +57,15 @@
             <br>
             <%= channel %>
             <br>
-            <button type="button" class="btn btn-primary" id="edit-btn">Edit</button>
+            <button type="button" class="btn btn-primary edit-btn">Edit</button>
             <button type="button" class="btn btn-danger destroy">Delete</button>
         </div>
         <div class="edit">
-            <input type="text" value="<%= name %>" id="edited-name">
+            <input type="text" value="<%= name %>" class="edited-name">
             <br>
-            <input type="text" value="<%= channel %>" id="edited-channel">
+            <input type="text" value="<%= channel %>" class="edited-channel">
             <br>
-            <button type="button" class="btn btn-primary" id="save-btn">Save</button>
+            <button type="button" class="btn btn-primary save-btn">Save</button>
             <button type="button" class="btn btn-danger destroy">Delete</button>
         </div>
         </script>

@@ -36,13 +36,14 @@ class MainPage(webapp2.RequestHandler):
 
 
 #Handler for Artist collection
-class ArtistHandler(webapp2.RequestHandler):
+class AllArtistHandler(webapp2.RequestHandler):
     def get(self):
         # get all artists from datastore
         # present artists as json
         artists = []
         for artist in Artist.all():
             artist_obj = artist.to_dict()
+            artist_obj["id"] = artist.key().id()
             artists.append(artist_obj)
         # remove
         if len(artists) < 1:
@@ -89,17 +90,20 @@ class ArtistHandler(webapp2.RequestHandler):
             artist = Artist(name=name, channel=channel, videos=videos_json)
             artist.put()
             artist_info = artist.to_dict()
+            artist_info["id"] = artist.key().id()
             self.response.out.write(json.dumps(artist_info))
         except urllib2.HTTPError, e:
             logging.info(e.read())
             self.response.status = 400
             self.response.out.write("Something went wrong")
 
+
+class SinglArtistHandler(webapp2.RequestHandler):
     def put(self, id):
         # get artist from datastore
         # update entity based on client request
         # save info
-        artist = Artist.get_by_id(id)
+        artist = Artist.get_by_id(int(id))
         if artist is None:
             self.response.status = 404
             self.response.out.write("Diva not found")
@@ -114,22 +118,25 @@ class ArtistHandler(webapp2.RequestHandler):
         artist.videos = data["videos"]
         artist.put()
         artist_dict = artist.to_dict()
+        artist_dict["id"] = id
         self.response.out.write(json.dumps(artist_dict))
 
     def delete(self, id):
         # get artist (based on artist's name) from datastore
         # remove artist
         # return confirmation
-        artist = Artist.get_by_id(id)
+        artist = Artist.get_by_id(int(id))
         if artist is None:
             self.response.status = 404
             self.response.out.write("Diva not found")
             return
         artist.delete()
+        deletion_response = "Deletion successful"
+        self.response.out.write(json.dumps(deletion_response))
 
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/divas', ArtistHandler),
-    ('/divas/(\d+)', ArtistHandler),
+    ('/divas', AllArtistHandler),
+    ('/divas/(\d+)', SinglArtistHandler),
     ],  debug=True)
