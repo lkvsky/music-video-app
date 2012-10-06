@@ -6,6 +6,7 @@ import urllib2
 import logging
 
 from google.appengine.ext import db
+from google.appengine.api import users
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -30,6 +31,20 @@ def video_search(channel):
     return json.dumps(artist_videos)
 
 
+def admin_required(handler_method):
+    def check_admin(self):
+        if self.request.method != 'GET':
+            self.abort(400)
+        user = users.get_current_user()
+        if not user:
+            return self.redirect(users.create_login_url(self.request.url))
+        elif not users.is_current_user_admin():
+            self.abort(403)
+        else:
+            handler_method(self)
+    return check_admin
+
+
 class Artist(db.Model):
     name = db.StringProperty()
     channel = db.StringProperty()
@@ -37,11 +52,22 @@ class Artist(db.Model):
     videos = db.TextProperty()
 
     def to_dict(self):
-        artist_dict = {"name": self.name, "channel": self.channel, "videos": self.videos}
+        video_list = json.loads(self.videos)
+        artist_dict = {"name": self.name, "channel": self.channel, "videos": video_list}
         return artist_dict
 
 
 class MainPage(webapp2.RequestHandler):
+    def get(self):
+        values = {
+        'debug': is_devserver()
+        }
+        template = jinja_environment.get_template('index.html')
+        self.response.out.write(template.render(values))
+
+
+class AdminPage(webapp2.RequestHandler):
+    @admin_required
     def get(self):
         values = {
         'debug': is_devserver()
@@ -143,6 +169,7 @@ class SinglArtistHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
+    ('/admin', AdminPage),
     ('/divas', AllArtistHandler),
     ('/divas/(\d+)', SinglArtistHandler),
     ],  debug=True)

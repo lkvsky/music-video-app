@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="static/css/bootstrap.min.css">
         <link rel="stylesheet" href="static/css/bootstrap-responsive.min.css">
         <link rel="stylesheet" href="static/css/main.css">
+        <script data-main="static/js/main" src="static/js/lib/require.js"></script>
     </head>
     <body>
 
@@ -28,48 +29,20 @@
             </div>
         </div>
 
-        <div class="container">
-
+        <div class="container" id="admin-container">
             <div class="row">
-                <div class="span3" id="diva-creator">
-                    <form>
-                        <legend>Create a Diva</legend>
-                        <label>Artist Name</label>
-                        <input type="text" class="input-medium" id="diva-name">
-                        <button type="button" class="btn" id="find-channel">+</button>
-                        <div id="channel-list">
-                        </div>
-                        <label>Channel Name</label>
-                        <input type="text" class="input-medium" id="diva-channel">
-                        <br>
-                        <button type="button" class="btn" id="create-diva">Create</button>
-                    </form>
-                </div>
-                <div class="span6" id="diva-list">
+                <div class="span4" id="diva-creator">
                 </div>
             </div>
 
-        </div> <!-- /container -->
-        <!-- templates -->
-        <script id="diva-view-tpl" type="text/underscore">
-        <div class="diva-info">
-            <%= name %>
-            <br>
-            <%= channel %>
-            <br>
-            <button type="button" class="btn btn-primary edit-btn">Edit</button>
-            <button type="button" class="btn btn-danger destroy">Delete</button>
-        </div>
-        <div class="edit">
-            <input type="text" value="<%= name %>" class="edited-name">
-            <br>
-            <input type="text" value="<%= channel %>" class="edited-channel">
-            <br>
-            <button type="button" class="btn btn-primary save-btn">Save</button>
-            <button type="button" class="btn btn-danger destroy">Delete</button>
-        </div>
-        </script>
-        <!-- /templates -->
+            <div class="row">
+                <div class="span4" id="diva-list">
+                </div>
+            </div>
+
+        </div> 
+        <!-- /container -->
+        <!--
         {% if debug %}
         <script src="static/js/lib/jquery-1.8.0.min.js"></script>
         <script src="static/js/lib/underscore-min.js"></script>
@@ -78,6 +51,7 @@
         {% else %}
         <script src="static/build/all.min.js"></script>
         {% endif %}
+        -->
     </body>
 </html>
 

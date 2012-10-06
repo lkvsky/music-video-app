@@ -15,3 +15,9 @@ body {
 .editing .diva-info, .edit {
 	display: none;
 }
+.video-info .hide {
+	display: none;
+}
+.video_info {
+	display: block;
+}
