@@ -53,8 +53,16 @@ class Artist(db.Model):
 
     def to_dict(self):
         video_list = json.loads(self.videos)
-        artist_dict = {"name": self.name, "channel": self.channel, "videos": video_list}
+        artist_dict = {"name": self.name, "channel": self.channel, "videos": video_list, "id": self.key().id()}
         return artist_dict
+
+
+class Mix(db.Model):
+    values = db.StringListProperty()
+
+    def to_dict(self):
+        mix_dict = {"values": self.values, "id": self.key().id()}
+        return mix_dict
 
 
 class MainPage(webapp2.RequestHandler):
@@ -84,9 +92,7 @@ class AllArtistHandler(webapp2.RequestHandler):
         artists = []
         for artist in Artist.all():
             artist_obj = artist.to_dict()
-            artist_obj["id"] = artist.key().id()
             artists.append(artist_obj)
-        # remove
         if len(artists) < 1:
             self.response.status = 400
             self.response.out.write("There are no artists yet")
@@ -120,7 +126,6 @@ class AllArtistHandler(webapp2.RequestHandler):
             artist = Artist(name=name, channel=channel, videos=videos_json)
             artist.put()
             artist_info = artist.to_dict()
-            artist_info["id"] = artist.key().id()
             self.response.out.write(json.dumps(artist_info))
         except urllib2.HTTPError, e:
             logging.info(e.read())
@@ -150,7 +155,6 @@ class SinglArtistHandler(webapp2.RequestHandler):
         artist.videos = data["videos"]
         artist.put()
         artist_dict = artist.to_dict()
-        artist_dict["id"] = id
         self.response.out.write(json.dumps(artist_dict))
 
     def delete(self, id):
@@ -167,9 +171,49 @@ class SinglArtistHandler(webapp2.RequestHandler):
         self.response.out.write(json.dumps(deletion_response))
 
 
+class MixHandler(webapp2.RequestHandler):
+    def get(self):
+        mixes = []
+        for mix in Mix.all():
+            mix_dict = mix.to_dict()
+            mixes.append(mix_dict)
+        if len(mixes) < 1:
+            self.response.status = 400
+            self.response.out.write("there are no mixes")
+            return
+        self.response.out.write(json.dumps(mixes))
+
+    def post(self):
+        # take artists IDs and fetch models from datastore
+        # take artist video list, append it to a new list
+        # return list
+        data = json.loads(self.request.body)
+        values = data.get("values", "")
+        if len(values) is None:
+            self.response.status = 400
+            self.respons.out.write("give me more")
+        mix = Mix(values=values)
+        mix.put()
+        mix_dict = mix.to_dict()
+        self.response.out.write(json.dumps(mix_dict))
+
+
+class SingleMixHandler(webapp2.RequestHandler):
+    def get(self, id):
+        mix = Mix.get_by_id(int(id))
+        if mix is None:
+            self.response.status = 404
+            self.response.out.write("Mix not found")
+            return
+        mix_dict = mix.to_dict()
+        self.response.out.write(json.dumps(mix_dict))
+
+
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/admin', AdminPage),
     ('/divas', AllArtistHandler),
     ('/divas/(\d+)', SinglArtistHandler),
+    ('/mixes', MixHandler),
+    ('/mixes/(\d+)', SingleMixHandler)
     ],  debug=True)

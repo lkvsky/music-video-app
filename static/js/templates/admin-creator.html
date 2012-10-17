@@ -1,12 +1,13 @@
 <form>
     <legend>Create a Diva</legend>
     <label>Artist Name</label>
-    <input type="text" class="input-medium" id="diva-name">
-    <button type="button" class="btn" id="find-channel">+</button>
-    <div id="channel-list">
+    <div class="input-append">
+        <input type="text" class="input-medium" id="diva-name">
+        <button type="button" class="btn" id="find-channel">Search</button>
     </div>
     <label>Channel Name</label>
-    <input type="text" class="input-medium" id="diva-channel">
+    <select type="select" id="diva-channel">
+    </select>
     <br>
     <button type="button" class="btn" id="create-diva">Create</button>
 </form>

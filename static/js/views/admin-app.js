@@ -4,10 +4,11 @@ define([
 	'backbone',
 	'models/diva',
 	'collections/divas',
-	'views/diva-admin',
+	'views/admin-diva',
+	'views/user-app',
 	'text!templates/admin-creator.html'
 ],
-function($, _, Backbone, Diva, DivaCollection, DivaAdminView, adminCreator) {
+function($, _, Backbone, Diva, DivaCollection, DivaAdminView, UserApp, adminCreator) {
 	var AdminAppView = Backbone.View.extend({
 
 		el: $("#admin-container"),
@@ -55,7 +56,7 @@ function($, _, Backbone, Diva, DivaCollection, DivaAdminView, adminCreator) {
 		},
 
 		channelSearch: function() {
-			$("#channel-list").empty();
+			$("#diva-channel").empty();
 			var query = $("#diva-name").val();
 			$.ajax({
 				url: "https://gdata.youtube.com/feeds/api/channels",
@@ -75,8 +76,9 @@ function($, _, Backbone, Diva, DivaCollection, DivaAdminView, adminCreator) {
 						channelOptions.push(channel.author[0].name.$t);
 					});
 					$.each(channelOptions, function(index, channel) {
-						var channelDiv = $("<div>").html(channel);
-						$("#channel-list").append(channelDiv);
+						var channelOption = $("<option>").val(channel);
+						channelOption.html(channel);
+						$("#diva-channel").append(channelOption);
 					});
 				}
 			});

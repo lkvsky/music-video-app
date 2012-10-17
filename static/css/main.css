@@ -21,3 +21,6 @@ body {
 .video_info {
 	display: block;
 }
+#diva-selector {
+	width: 80%;
+}

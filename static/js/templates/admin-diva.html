@@ -1,17 +1,25 @@
-<div class="diva-info">
-    <%= name %>
-    <br>
-    <%= channel %>
-    <br>
-    <button type="button" class="btn btn-primary edit-btn">Edit</button>
-    <button type="button" class="btn btn-primary show-videos">Videos</button>
-    <button type="button" class="btn btn-danger destroy">Delete</button>
-</div>
-<div class="edit">
-    <input type="text" value="<%= name %>" class="edited-name">
-    <br>
-    <input type="text" value="<%= channel %>" class="edited-channel">
-    <br>
-    <button type="button" class="btn btn-primary save-btn">Save</button>
-    <button type="button" class="btn btn-danger destroy">Delete</button>
+<div class="well">
+    <div class="diva-info">
+        <%= name %>
+        <br>
+        <%= channel %>
+        <br>
+        <button type="button" class="btn btn-primary edit-btn">Edit</button>
+        <button type="button" class="btn btn-primary show-videos">Videos</button>
+        <button type="button" class="btn btn-danger destroy">Delete</button>
+    </div>
+    <div class="edit">
+        <input type="text" value="<%= name %>" class="edited-name">
+        <br>
+        <input type="text" value="<%= channel %>" class="edited-channel">
+        <br>
+        <button type="button" class="btn btn-primary save-btn">Save</button>
+        <button type="button" class="btn btn-danger destroy">Delete</button>
+    </div>
+    <div class="video-info hide">
+        <% _.each(videos, function(video) { %>
+        <img src="<%= video.img %>" alt="<%= video.title %>" class="img-rounded">
+        <h5><%= video.title %></h5>
+        <%  }); %>
+    </div>
 </div>

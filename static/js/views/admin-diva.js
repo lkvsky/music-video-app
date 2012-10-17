@@ -3,13 +3,10 @@ define([
 'underscore',
 'backbone',
 'models/diva',
-'text!templates/admin-diva.html',
-'text!templates/admin-video.html'
+'text!templates/admin-diva.html'
 ],
 function($, _, Backbone, Diva, adminDiva, adminVideo) {
 	var DivaAdminView = Backbone.View.extend({
-
-		model: Diva,
 
 		events: {
 			"click .edit-btn"        : "editDiva",
@@ -29,19 +26,7 @@ function($, _, Backbone, Diva, adminDiva, adminVideo) {
 			this.compiled = _.template(adminDiva);
 			this.item = this.compiled(this.model.toJSON());
 			this.rendered = $(this.el).html(this.item);
-			$(this.rendered).append(this.videoList());
 			return this.rendered;
-		},
-
-		videoList: function() {
-			var thumbList = $("<ul>");
-			$(thumbList).addClass("thumbnails");
-			var compiledVideo = _.template(adminVideo);
-			_.each(this.model.attributes.videos, function(video) {
-				this.videoPreview = compiledVideo({ title : video.title, img : video.img, ytid : video.ytid });
-				$(thumbList).append(this.videoPreview);
-			});
-			return thumbList;
 		},
 
 		editDiva: function() {

@@ -1,0 +1,21 @@
+<script>
+$(document).ready(function() {
+    $("#diva-selector").select2({
+        width: "element",
+        maximumSelectionSize: 5,
+        placeholder: "Make your mix..."
+    });
+});
+</script>
+<div class="row">
+    <div class="span12">
+        <form>
+            <select multiple="multiple" id="diva-selector">
+            	<% divas.each(function(diva) { %>
+            		<option value="<%= diva.attributes.id %>"><%= diva.attributes.name %></option>
+            	<%	}); %>
+           	</select>
+            <button type="button" class="btn btn-primary" id="mix-maker">Play</button>
+        </form>
+    </div>
+</div>

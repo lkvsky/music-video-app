@@ -6,11 +6,11 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     lint: {
-      files: ['grunt.js', SRC_JS + 'main.js']
+      files: ['grunt.js', SRC_JS + 'main.js' + SRC_JS + 'collections/divas.js' + SRC_JS + 'models/diva.js' + SRC_JS + 'views/admin-app.js' + SRC_JS + 'views/diva-admin.js']
     },
     concat: {
       dist: {
-        src: [ SRC_JS + 'lib/jquery-1.8.0.min.js', SRC_JS + 'lib/underscore-min.js', SRC_JS + 'lib/backbone-min.js', SRC_JS + 'main.js'],
+        src: [ SRC_JS + 'lib/jquery-1-8-0-min.js', SRC_JS + 'lib/underscore-min.js', SRC_JS + 'lib/backbone-min.js', SRC_JS + 'main.js' + SRC_JS + 'collections/divas.js' + SRC_JS + 'models/diva.js' + SRC_JS + 'views/admin-app.js' + SRC_JS + 'views/diva-admin.js'],
         dest: 'build/all.js'
       }
     },
