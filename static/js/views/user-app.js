@@ -37,6 +37,8 @@ define([
 				var values = $("#diva-selector").val();
 				this.mix = new Mix({ values : values });
 				this.mixShuffle();
+				var firstVid = this.shuffle[0].ytid;
+				this.loadYtApi(firstVid);
 			},
 			// create a master list of possible videos for each retreived model
 			mixVideos: function(model) {
@@ -57,6 +59,25 @@ define([
 				for (i=0; i<10; i++) {
 					this.shuffle.push(this.masterList[Math.floor(Math.random() * this.masterList.length)]);
 				}
+			},
+
+			loadYtApi: function(ytid) {
+				var ytScript = document.createElement('script');
+				ytScript.src = "//www.youtube.com/iframe_api";
+				$('body').append(ytScript);
+				window["onYouTubeIframeAPIReady"] = function() {
+					var player = new YT.Player('player', {
+						height: '390',
+						width: '640',
+						videoId: ytid,
+						events: {
+							'onReady': onPlayerReady
+						}
+					});
+					var onPlayerReady = function(event) {
+						event.target.playVideo();
+					};
+				};
 			}
 
 		});
