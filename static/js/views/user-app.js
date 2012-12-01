@@ -4,10 +4,12 @@ define([
 	'backbone',
 	'select2',
 	'models/mix',
+	'models/diva',
 	'collections/divas',
+	'views/user-mix',
 	'text!templates/station-creator.html'
 	],
-	function($, _, Backbone, select, Mix, DivaCollection, stationCreator) {
+	function($, _, Backbone, select, Mix, Diva, DivaCollection, mixView, stationCreator) {
 		var UserView = Backbone.View.extend({
 			
 			el: $("#user-container"),
@@ -18,7 +20,10 @@ define([
 
 			initialize: function() {
 				_.bindAll(this, "render", "mixVideos", "mixShuffle");
+
+				this.mixView = new mixView();
 				this.divas = new DivaCollection();
+
 				this.divas.bind("reset", this.render);
 				this.divas.bind("change", this.render);
 				this.divas.fetch();
@@ -38,7 +43,7 @@ define([
 				this.mix = new Mix({ values : values });
 				this.mixShuffle();
 				var firstVid = this.shuffle[0].ytid;
-				this.loadYtApi(firstVid);
+				this.mixView.loadYtApi(firstVid);
 			},
 			// create a master list of possible videos for each retreived model
 			mixVideos: function(model) {
@@ -59,25 +64,6 @@ define([
 				for (i=0; i<10; i++) {
 					this.shuffle.push(this.masterList[Math.floor(Math.random() * this.masterList.length)]);
 				}
-			},
-
-			loadYtApi: function(ytid) {
-				var ytScript = document.createElement('script');
-				ytScript.src = "//www.youtube.com/iframe_api";
-				$('body').append(ytScript);
-				window["onYouTubeIframeAPIReady"] = function() {
-					var player = new YT.Player('player', {
-						height: '390',
-						width: '640',
-						videoId: ytid,
-						events: {
-							'onReady': onPlayerReady
-						}
-					});
-					var onPlayerReady = function(event) {
-						event.target.playVideo();
-					};
-				};
 			}
 
 		});

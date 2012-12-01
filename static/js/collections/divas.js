@@ -3,7 +3,12 @@ define(['underscore', 'backbone', 'models/diva'], function(_, Backbone, Diva) {
 
 		model: Diva,
 
-		url: "/divas"
+		url: "/divas",
+
+		comparator: function(diva) {
+			return diva.get("name");
+		}
+
 	});
 	return Divas;
 });

@@ -43,6 +43,7 @@ function($, _, Backbone, Diva, DivaCollection, DivaAdminView, UserApp, adminCrea
 		},
 
 		displayAll: function() {
+			this.divas.sort({silent:true});
 			this.divas.each(this.displayDiva);
 		},
 
