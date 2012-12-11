@@ -9,7 +9,7 @@ define([
 
 			el: $("#user-container"),
 
-			loadYtApi: function(ytid) {
+			loadYtApi: function(first, rest) {
 				this.mixTpl = _.template(mixViewer);
 				$(this.el).append(this.mixTpl);
 				var ytScript = document.createElement('script');
@@ -19,14 +19,9 @@ define([
 					var player = new YT.Player('player', {
 						height: '390',
 						width: '640',
-						videoId: ytid,
-						events: {
-							'onReady': onPlayerReady
-						}
+						videoId: first,
+						playerVars: {playlist: rest}
 					});
-					var onPlayerReady = function(event) {
-						event.player.playVideo();
-					};
 				};
 			}
 

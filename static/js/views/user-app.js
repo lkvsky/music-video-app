@@ -42,8 +42,14 @@ define([
 				var values = $("#diva-selector").val();
 				this.mix = new Mix({ values : values });
 				this.mixShuffle();
+				var shuffledList = [];
+				_.each(this.shuffle, function(video) {
+					shuffledList.push(video.ytid);
+				});
+				shuffledList.splice(0, 1);
+				var shuffledString = shuffledList.toString();
 				var firstVid = this.shuffle[0].ytid;
-				this.mixView.loadYtApi(firstVid);
+				this.mixView.loadYtApi(firstVid, shuffledString);
 			},
 			// create a master list of possible videos for each retreived model
 			mixVideos: function(model) {
